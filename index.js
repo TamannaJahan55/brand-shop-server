@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         const productCollection = client.db('brandDB').collection('products')
         const cartCollection = client.db('brandDB').collection('cart')
@@ -88,11 +88,29 @@ async function run() {
             const result = await productCollection.updateOne(filter, product, options)
             res.send(result);
         })
+        
+
+        // user related api
+        app.get('/cart/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(email);
+            const query = {email : email}
+            console.log(query);
+            const result = await cartCollection.find(query).toArray();
+            res.send(result);
+        })
 
         app.post('/cart', async (req, res) => {
             const cartProduct = req.body;
             console.log(cartProduct);
             const result = await cartCollection.insertOne(cartProduct);
+            res.send(result);
+        })
+
+        app.delete('/cart/:id', async (req, res) =>{
+            const id = req.params.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await cartCollection.deleteOne(query);
             res.send(result);
         })
 
